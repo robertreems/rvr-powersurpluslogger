@@ -1,1 +1,3 @@
 # rvrlogging
+
+Logging to Azure.
