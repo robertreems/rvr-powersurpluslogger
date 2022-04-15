@@ -29,4 +29,3 @@ class config:
         for section in self.config.sections():
             if key in self.config[section].keys():
                 return self.config[section][key]
-                

@@ -33,7 +33,6 @@ class Log_analytics_logger:
         authorization = "SharedKey {}:{}".format(customer_id, encoded_hash)
         return authorization
 
-
     def post_data(self, body, log_type):
         """Sends payload to Azure Log Analytics Workspace
 
@@ -66,14 +65,14 @@ class Log_analytics_logger:
         if (response.status_code >= 200 and response.status_code <= 299):
             logging.info('Accepted payload:' + body)
         else:
-            logging.error("Unable to Write: " + format(response.status_code)) # todo throw
+            logging.error("Unable to Write: " +
+                          format(response.status_code))  # todo throw
 
-
-    def post_application_event(self, type, message): # todo use enum for type
+    def post_application_event(self, type, message):
         body = {
             "hostname": node(),
             "script_path": sys.argv[0],
-            "arguments" : sys.argv[1:],
+            "arguments": sys.argv[1:],
             "type": type,
             "message": message
         }
