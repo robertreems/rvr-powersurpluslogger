@@ -81,5 +81,16 @@ class Log_analytics_logger:
 
         self.post_data(body_json, LOG_TYPE_APPLICATION_EVENT)
 
+    def post_metric(self,log_type, metric_name, value):
+        body = {
+            "hostname": node(),
+            "script_path": sys.argv[0],
+            "metric_name" : metric_name,
+            "value" : value
+        }
+
+        body_json = json.dumps(body)
+        self.post_data(body_json, log_type)
+
     def post_application_starting_event(self):
         self.post_application_event('info', 'Starting')
