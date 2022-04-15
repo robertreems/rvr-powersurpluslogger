@@ -1,3 +1,4 @@
 ﻿deploy/.terraform/
 deploy/.terraform.lock.hcl
 deploy/terraform.tfstate
+rvrlogging/__pycache__/
