@@ -1,20 +1,28 @@
 ﻿from dbus import ValidationException
 import loganalyticslogger
 import logging
+from platform import node
+from constants import NOTIFY_APPLICATION_EVENT, VALID_MESSAGE_TYPES
+from notify_run import Notify
 
-from constants import VALID_MESSAGE_TYPES
 
-
+# Todo maak netjes
 class mylogger(loganalyticslogger.Log_analytics_logger):
 
     def __init__(self):
         super().__init__()
+        self.notify = Notify()
 
-    def log_start(self):
-        self.post_application_starting_event()
-        logging.info('starting')
+        if not self.notify.config_file_exists:
+            self.notify.register()
 
-    def log_application_event(self, type, message):
+        self.__log_start()
+
+    def __log_start(self):
+        message = f'Starting, notify URL: {self.notify.endpoint}'
+        self.log_application_event(type='info', message=message)
+
+    def log_application_event(self, type, message, notify_message=False):
         if not type in VALID_MESSAGE_TYPES:
             raise ValidationException(
                 f'{type} is not in {VALID_MESSAGE_TYPES}.')
@@ -29,3 +37,6 @@ class mylogger(loganalyticslogger.Log_analytics_logger):
             logging.warning(message)
         elif type == 'error':
             logging.error(message)
+
+        if notify_message:
+            self.notify.send(NOTIFY_APPLICATION_EVENT.format(type=type, node=node(), message=message))

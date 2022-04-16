@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 # from https://medium.com/slalom-build/reading-and-writing-to-azure-log-analytics-c78461056862
 
 import json
@@ -91,6 +90,3 @@ class Log_analytics_logger:
 
         body_json = json.dumps(body)
         self.post_data(body_json, log_type)
-
-    def post_application_starting_event(self):
-        self.post_application_event('info', 'Starting')
