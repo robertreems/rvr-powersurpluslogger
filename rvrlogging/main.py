@@ -47,11 +47,11 @@ while True:
     thelogger.post_metric('power_usage', 'active_power_surplus_t2', active_power_tariff2)
 
     # Send a notification message if there is no energy surplus for a prolonged time.
-    active_power_history.append(active_power_tariff1)
-    active_power_history.append(active_power_tariff2)
+    active_power_history.insert(0, active_power_tariff1)
+    active_power_history.insert(0, active_power_tariff2)
 
     # remove the measurements after x measures.
-    del active_power_history[10:]
+    del active_power_history[20:]
 
     if sum(active_power_history) == 0 and is_no_power_notification_send == False:
         thelogger.log_application_event(type='info', message='No power surplus for a prolonged time.', notify_message=True)
