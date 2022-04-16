@@ -31,17 +31,17 @@ while True:
     result = requests.get(f'http://{ip}/api/v1/telegram')
     json_result = result.content.splitlines()
 
-    # Get the current tariff2 in byte string. Select substring 10:19 convert to string and to float.
-    # The 6 line of the telegram message is the Meter Reading electricity delivered by client (Tariff 1) in 0,001 kWh
+    # Get the specific tarifs in byte string. Select substring 10:19 convert to string and to float.
+    # The 5th and 6th line of the telegram message is the Meter Reading electricity delivered by client in 0,001 kWh.
+    start_tariff1 = float(json_result[5][10:19].decode('utf-8'))
     start_tariff2 = float(json_result[6][10:19].decode('utf-8'))
     sleep(60)
 
     result = requests.get(f'http://{ip}/api/v1/telegram')
     json_result = result.content.splitlines()
+    end_tariff1 = float(json_result[5][10:19].decode('utf-8'))
     end_tariff2 = float(json_result[6][10:19].decode('utf-8'))
 
     # todo create a nice conversion function that does the calculation
-    thelogger.post_metric('power_usage', 'active_power_surplus', int(((end_tariff2 - start_tariff2) * 60) * 1000))
-
-    # Todo send notification when the surpluss falls to 0
-    # todo add tariff1
+    thelogger.post_metric('power_usage', 'active_power_surplus_t1', int(((end_tariff1 - start_tariff1) * 60) * 1000))
+    thelogger.post_metric('power_usage', 'active_power_surplus_t2', int(((end_tariff2 - start_tariff2) * 60) * 1000))
