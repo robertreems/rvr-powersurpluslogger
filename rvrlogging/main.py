@@ -51,7 +51,7 @@ while True:
     active_power_history.append(active_power_tariff2)
 
     # remove the measurements after x measures.
-    del active_power_history[:10]
+    del active_power_history[10:]
 
     if sum(active_power_history) == 0 and is_no_power_notification_send == False:
         thelogger.log_application_event(type='info', message='No power surplus for a prolonged time.', notify_message=True)
