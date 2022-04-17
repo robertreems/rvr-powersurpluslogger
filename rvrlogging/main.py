@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 import logging
 from time import sleep
-import mylogger
 import requests
-import config
-from constants import CONFIG_FILE
+from rvrbase import rvrlogger
+from rvrbase import rvrconfig
+from rvrbase import constants
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 # Get IP of the dongle
-conf = config.config(CONFIG_FILE)
+conf = rvrconfig.Rvrconfig(constants.CONFIG_FILE)
 ip = conf.q1('hwip')
-thelogger = mylogger.mylogger()
+thelogger = rvrlogger.Rvrlogger()
 is_no_power_notification_send = False
 
 # The initial plan was to use the '/api/v1/data' api to retrieve my solar power surplus from one of the api properties written in 
@@ -61,7 +61,3 @@ while True:
     elif sum(active_power_history) > 1000 and is_no_power_notification_send == True:
         thelogger.log_application_event(type='info', message=f'You have got some juice. {sum(active_power_history)} Watts surplus in the past 10 minutes. Use it!', notify_message=True)
         is_no_power_notification_send = False
-
-
-
-
