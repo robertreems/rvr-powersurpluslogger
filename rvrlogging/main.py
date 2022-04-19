@@ -73,6 +73,7 @@ while True:
         active_power_history.insert(0, active_power_tariff2)
 
         # remove the measurements after x measures.
+        # todo filter this list from 0 values to make the code more logic
         del active_power_history[20:]
 
         if sum(active_power_history) == 0 and is_no_power_notification_send is False:
