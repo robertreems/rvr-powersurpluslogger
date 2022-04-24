@@ -24,7 +24,7 @@ class TestRun(unittest.TestCase):
         \r\n0-0:96.13.1()\
         \r\n0-0:96.13.0()\
         \r\n!'
-    
+
     def test_Average(self):
         data = [1, 2, 3]
         result = main.Average(data)

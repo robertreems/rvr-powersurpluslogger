@@ -29,6 +29,7 @@ is_no_power_notification_send = False
 def Average(lst):
     return sum(lst) / len(lst)
 
+
 def read_meters():
     # Get the telegram
     result = requests.get(f'http://{ip}/api/v1/telegram')
@@ -46,6 +47,7 @@ def read_meters():
     tariff2 = float(json_result[6][10:19].decode('utf-8'))
 
     return tariff1, tariff2
+
 
 def read_meters_enery_delivered():
     # Get the telegram
@@ -79,9 +81,7 @@ def send_notification(active_power_history):
         # longer any surplus.
     elif Average(active_power_history) > 250 and is_no_power_notification_send is True:
         thelogger.log_application_event(
-            type='info', message=f'You have got some juice. An average of \
-                        {Average(active_power_history)} surplus in the past 10 minutes. Use it!',
-            notify_message=True)
+            type='info', message='You have got some juice. Use it!', notify_message=True)
         is_no_power_notification_send = False
 
 
