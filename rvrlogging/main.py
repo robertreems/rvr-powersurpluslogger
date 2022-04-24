@@ -12,7 +12,7 @@ from time import sleep
 import requests
 from rvrbase import rvrlogger
 from rvrbase import rvrconfig
-from rvrbase import constants
+import constants
 import logging
 import exceptions
 
