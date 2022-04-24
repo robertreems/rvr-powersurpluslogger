@@ -29,6 +29,23 @@ is_no_power_notification_send = False
 def Average(lst):
     return sum(lst) / len(lst)
 
+def read_meters():
+    # Get the telegram
+    result = requests.get(f'http://{ip}/api/v1/telegram')
+
+    if result.status_code != 200:
+        raise exceptions.HomeWizzardCommunication(
+            constants.ERR_UNEXPECTED_HTTP_RESPONSE.format(response=result))
+
+    json_result = result.content.splitlines()
+
+    # Get the specific tarifs in byte string. Select substring 10:19 convert to string and
+    # to float. The 5th and 6th line of the telegram message is the Meter Reading
+    # electricity delivered by client in 0,001 kWh.
+    tariff1 = float(json_result[5][10:19].decode('utf-8'))
+    tariff2 = float(json_result[6][10:19].decode('utf-8'))
+
+    return tariff1, tariff2
 
 def read_meters_enery_delivered():
     # Get the telegram

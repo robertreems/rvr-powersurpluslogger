@@ -7,6 +7,24 @@ from exceptions import HomeWizzardCommunication
 
 
 class TestRun(unittest.TestCase):
+    # 4th line = Meter Reading electricity delivered to client (Tariff 1) in 0,001 kWh
+    # 5th line = Meter Reading electricity delivered to client (Tariff 2) in 0,001 kWh
+    # 6th line = Meter Reading electricity delivered by client (Tariff 1) in 0,001 kWh
+    # 7th line = Meter Reading electricity delivered by client (Tariff 2) in 0,001 kWh
+    example_HW_return = b'/XMX5XMXABCE000030057\
+        \r\n\
+        \r\\n0-0:96.1.1(39383239353535372020202020202020)\
+        \r\n1-0:1.8.1(15422.201*kWh)\
+        \r\n1-0:1.8.2(13272.006*kWh)\
+        \r\n1-0:2.8.1(03335.474*kWh)\
+        \r\n1-0:2.8.2(07612.880*kWh)\
+        \r\n0-0:96.14.0(0001)\
+        \r\n1-0:1.7.0(0003.96*kW)\
+        \r\n1-0:2.7.0(0000.00*kW)\
+        \r\n0-0:96.13.1()\
+        \r\n0-0:96.13.0()\
+        \r\n!'
+    
     def test_Average(self):
         data = [1, 2, 3]
         result = main.Average(data)
@@ -28,6 +46,16 @@ garbage\n\
 
         self.assertEqual(tariff1, 1.0)
         self.assertEqual(tariff2, 15.0)
+
+    @mock.patch('requests.get')
+    def test_read_meters(self, mock_requests_get):
+        mock_requests_get().status_code = 200
+        mock_requests_get().content = self.example_HW_return
+
+        tariff1, tariff2 = main.read_meters_enery_delivered()
+
+        self.assertEqual(tariff1, 3335.474)
+        self.assertEqual(tariff2, 7612.88)
 
     @mock.patch('requests.get')
     def test_read_meters_enery_delivered_fail(self, mock_requests_get):
