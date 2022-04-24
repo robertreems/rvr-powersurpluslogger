@@ -33,19 +33,12 @@ class TestRun(unittest.TestCase):
     @mock.patch('requests.get')
     def test_read_meters_enery_delivered_success(self, mock_requests_get):
         mock_requests_get().status_code = 200
-        mock_requests_get().content = b'garbage\n\
-garbage\n\
-garbage\n\
-garbage\n\
-garbage\n\
-----------000000001----\n\
-----------000000015----\n\
-'
+        mock_requests_get().content = self.example_HW_return
 
         tariff1, tariff2 = main.read_meters_enery_delivered()
 
-        self.assertEqual(tariff1, 1.0)
-        self.assertEqual(tariff2, 15.0)
+        self.assertEqual(tariff1, 3335.474)
+        self.assertEqual(tariff2, 7612.88)
 
     @mock.patch('requests.get')
     def test_read_meters(self, mock_requests_get):
