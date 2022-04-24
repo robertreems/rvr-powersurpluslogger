@@ -36,6 +36,13 @@ garbage\n\
         with self.assertRaises(HomeWizzardCommunication):
             main.read_meters_enery_delivered()
 
+    @mock.patch('requests.get')
+    def read_meters_enery_delivered_unknown_error(self, mock_requests_get):
+        mock_requests_get().status_code = 1234
+
+        with self.assertRaises(HomeWizzardCommunication):
+            main.read_meters_enery_delivered()
+
     # Notification should be send 1th time at no power.
     @mock.patch('rvrbase.rvrlogger.Rvrlogger.log_application_event')
     # @mock.patch('main.is_no_power_notification_send', False)
@@ -72,7 +79,7 @@ garbage\n\
         # The global var is_no_power_notification_send should be set to false.
         self.assertFalse(main.is_no_power_notification_send)
 
-    # Notification should not be send if a lot of power is produced and 
+    # Notification should not be send if a lot of power is produced and
     # is_no_power_notification_send is set to false
     @mock.patch('rvrbase.rvrlogger.Rvrlogger.log_application_event')
     @mock.patch('main.is_no_power_notification_send', False)

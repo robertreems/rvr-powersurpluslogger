@@ -13,8 +13,11 @@ import requests
 from rvrbase import rvrlogger
 from rvrbase import rvrconfig
 from rvrbase import constants
+import logging
 import exceptions
 
+
+logging.getLogger().setLevel(logging.INFO)
 
 # Get IP of the dongle
 conf = rvrconfig.Rvrconfig(constants.CONFIG_FILE)
