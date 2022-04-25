@@ -43,10 +43,12 @@ def read_meters():
     # Get the specific tarifs in byte string. Select substring 10:19 convert to string and
     # to float. The 5th and 6th line of the telegram message is the Meter Reading
     # electricity delivered by client in 0,001 kWh.
-    tariff1 = float(json_result[5][10:19].decode('utf-8'))
-    tariff2 = float(json_result[6][10:19].decode('utf-8'))
+    consumption_tariff1 = float(json_result[3][10:19].decode('utf-8'))
+    consumption_tariff2 = float(json_result[4][10:19].decode('utf-8'))
+    delivery_tariff1 = float(json_result[5][10:19].decode('utf-8'))
+    delivery_tariff2 = float(json_result[6][10:19].decode('utf-8'))
 
-    return tariff1, tariff2
+    return consumption_tariff1, consumption_tariff2, delivery_tariff1, delivery_tariff2
 
 
 def read_meters_enery_delivered():
@@ -71,7 +73,7 @@ def read_meters_enery_delivered():
 def send_notification(active_power_history):
     global is_no_power_notification_send
 
-    if sum(active_power_history) == 0 and is_no_power_notification_send is False:
+    if sum(active_power_history) <= 0 and is_no_power_notification_send is False:
         thelogger.log_application_event(
             type='info', message='No power surplus for a prolonged time.',
             notify_message=True)
@@ -85,31 +87,58 @@ def send_notification(active_power_history):
         is_no_power_notification_send = False
 
 
+# calculate the power used / produced in 60 seconds and convert it from kWh to Wh.
+def calc_power(start_power, end_power):
+    current = round(end_power - start_power, 3)
+    return((current * 60) * 1000)
+
+
+def aggregated_power(start_c_t1, start_c_t2, start_d_t1, start_d_t2, end_c_t1, end_c_t2, end_d_t1,
+                     end_d_t2):
+    consumption_tariff1 = calc_power(start_c_t1, end_c_t1)
+    consumption_tariff2 = calc_power(start_c_t2, end_c_t2)
+    delivery_tariff1 = calc_power(start_d_t1, end_d_t1)
+    delivery_tariff2 = calc_power(start_d_t2, end_d_t2)
+
+    return (delivery_tariff1 + delivery_tariff2) - (consumption_tariff1 + consumption_tariff2)
+
+
 def run():
     active_power_history = list()
 
     while True:
         try:
-            start_tariff1, start_tariff2 = read_meters_enery_delivered()
+            # c_t1 is consumption tariff 1.
+            # d_t1 is delivery tariff 1.
+            start_c_t1, start_c_t2, start_d_t1, start_d_t2 = read_meters()
 
             sleep(60)
 
-            end_tariff1, end_tariff2 = read_meters_enery_delivered()
+            end_c_t1, end_c_t2, end_d_t1, end_d_t2 = read_meters()
 
             # Log the current power measurement.
-            active_power_tariff1 = int(
-                ((end_tariff1 - start_tariff1) * 60) * 1000)
-            active_power_tariff2 = int(
-                ((end_tariff2 - start_tariff2) * 60) * 1000)
-            thelogger.post_metric(
-                'power_usage', 'active_power_surplus_t1', active_power_tariff1)
-            thelogger.post_metric(
-                'power_usage', 'active_power_surplus_t2', active_power_tariff2)
+            consumption_tariff1 = calc_power(start_c_t1, end_c_t1)
+            consumption_tariff2 = calc_power(start_c_t2, end_c_t2)
+            delivery_tariff1 = calc_power(start_d_t1, end_d_t1)
+            delivery_tariff2 = calc_power(start_d_t2, end_d_t2)
 
-            # Keep a history of max. 20 measurements.
-            active_power_history.insert(0, active_power_tariff1)
-            active_power_history.insert(0, active_power_tariff2)
-            del active_power_history[20:]
+            thelogger.post_metric(
+                'power_usage', 'consumption_tariff1', consumption_tariff1)
+            thelogger.post_metric(
+                'power_usage', 'consumption_tariff2', consumption_tariff2)
+            thelogger.post_metric(
+                'power_usage', 'delivery_tariff1', delivery_tariff1)
+            thelogger.post_metric(
+                'power_usage', 'delivery_tariff2', delivery_tariff2)
+
+            _aggregated_power = aggregated_power(start_c_t1, start_c_t2, start_d_t1, start_d_t2,
+                                                 end_c_t1, end_c_t2, end_d_t1, end_d_t2)
+            thelogger.post_metric(
+                'power_usage', 'aggregated_power', _aggregated_power)
+
+            # Keep a history of max. 10 measurements.
+            active_power_history.insert(0, _aggregated_power)
+            del active_power_history[10:]
 
             send_notification(active_power_history)
 
