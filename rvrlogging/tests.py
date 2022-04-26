@@ -32,17 +32,7 @@ class TestRun(unittest.TestCase):
         self.assertEqual(result, 2)
 
     @mock.patch('requests.get')
-    def test_read_meters_enery_delivered_success(self, mock_requests_get):
-        mock_requests_get().status_code = 200
-        mock_requests_get().content = self.example_HW_return
-
-        tariff1, tariff2 = main.read_meters_enery_delivered()
-
-        self.assertEqual(tariff1, 3335.474)
-        self.assertEqual(tariff2, 7612.88)
-
-    @mock.patch('requests.get')
-    def test_read_meters(self, mock_requests_get):
+    def test_read_meters_success(self, mock_requests_get):
         mock_requests_get().status_code = 200
         mock_requests_get().content = self.example_HW_return
 
@@ -62,18 +52,11 @@ class TestRun(unittest.TestCase):
             main.read_meters()
 
     @mock.patch('requests.get')
-    def test_read_meters_enery_delivered_fail(self, mock_requests_get):
-        mock_requests_get().status_code = 404
-
-        with self.assertRaises(HomeWizzardCommunication):
-            main.read_meters_enery_delivered()
-
-    @mock.patch('requests.get')
-    def read_meters_enery_delivered_unknown_error(self, mock_requests_get):
+    def read_meters_unknown_error(self, mock_requests_get):
         mock_requests_get().status_code = 1234
 
         with self.assertRaises(HomeWizzardCommunication):
-            main.read_meters_enery_delivered()
+            main.read_meters()
 
     # Notification should be send 1th time at no power.
     @mock.patch('rvrbase.rvrlogger.Rvrlogger.log_application_event')
@@ -134,8 +117,10 @@ class TestRun(unittest.TestCase):
         (0, 0, 0, 0, 1, 0, 0, 0, -60000),  # power has been consumed.
         (0, 0, 0, 0, 1, 0, 1, 0, 0),  # power has been delivered and consumed.
     ])
-    def test_aggregated_power(self, start_c_t1, start_c_t2, start_d_t1, start_d_t2, end_c_t1, end_c_t2, end_d_t1, end_d_t2, expected):
-        aggregated_power = main.aggregated_power(start_c_t1, start_c_t2, start_d_t1, start_d_t2, end_c_t1, end_c_t2, end_d_t1, end_d_t2)
+    def test_aggregated_power(self, start_c_t1, start_c_t2, start_d_t1, start_d_t2, end_c_t1,
+                              end_c_t2, end_d_t1, end_d_t2, expected):
+        aggregated_power = main.aggregated_power(
+            start_c_t1, start_c_t2, start_d_t1, start_d_t2, end_c_t1, end_c_t2, end_d_t1, end_d_t2)
 
         self.assertEqual(aggregated_power, expected)
 

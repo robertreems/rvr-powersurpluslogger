@@ -31,7 +31,7 @@ def Average(lst):
 
 
 def read_meters():
-    # Get the telegram
+    # Get the telegram.
     result = requests.get(f'http://{ip}/api/v1/telegram')
 
     if result.status_code != 200:
@@ -51,25 +51,6 @@ def read_meters():
     return consumption_tariff1, consumption_tariff2, delivery_tariff1, delivery_tariff2
 
 
-def read_meters_enery_delivered():
-    # Get the telegram
-    result = requests.get(f'http://{ip}/api/v1/telegram')
-
-    if result.status_code != 200:
-        raise exceptions.HomeWizzardCommunication(
-            constants.ERR_UNEXPECTED_HTTP_RESPONSE.format(response=result))
-
-    json_result = result.content.splitlines()
-
-    # Get the specific tarifs in byte string. Select substring 10:19 convert to string and
-    # to float. The 5th and 6th line of the telegram message is the Meter Reading
-    # electricity delivered by client in 0,001 kWh.
-    tariff1 = float(json_result[5][10:19].decode('utf-8'))
-    tariff2 = float(json_result[6][10:19].decode('utf-8'))
-
-    return tariff1, tariff2
-
-
 def send_notification(active_power_history):
     global is_no_power_notification_send
 
@@ -87,7 +68,7 @@ def send_notification(active_power_history):
         is_no_power_notification_send = False
 
 
-# calculate the power used / produced in 60 seconds and convert it from kWh to Wh.
+# Calculate the power used / produced in 60 seconds and convert it from kWh to Wh.
 def calc_power(start_power, end_power):
     current = round(end_power - start_power, 3)
     return((current * 60) * 1000)
@@ -143,7 +124,7 @@ def run():
             send_notification(active_power_history)
 
         except exceptions.HomeWizzardCommunication as error:
-            # todo enalble notify_message when method has been implented to prevent an overload of
+            # Todo enable notify_message when method has been implented to prevent an overload of
             # messages.
             thelogger.log_application_event(
                 type='error', message=error, notify_message=False)
@@ -153,7 +134,7 @@ def run():
             thelogger.log_application_event(type='error',
                                             message=constants.ERR_UNKNOWN_ERROR.format(
                                                 message=error), notify_message=False)
-            # todo enalble notify_message when method has
+            # Todo enable notify_message when method has
             # been implented to prevent an overload of messages.
             sleep(60)
 
