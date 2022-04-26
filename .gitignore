@@ -4,3 +4,4 @@ deploy/terraform.tfstate
 rvrlogging/__pycache__/
 rvrlogging/api/__pycache__/
 venv/
+rvrpowerlogger/__pycache__/
