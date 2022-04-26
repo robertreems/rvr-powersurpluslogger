@@ -93,29 +93,21 @@ def run():
             # d_t1 is delivery tariff 1.
             start_c_t1, start_c_t2, start_d_t1, start_d_t2 = read_meters()
 
+            # Log the current meter values.
+            thelogger.post_metric('power_usage', 'consumption_tariff1', start_c_t1)
+            thelogger.post_metric('power_usage', 'consumption_tariff2', start_c_t2)
+            thelogger.post_metric('power_usage', 'delivery_tariff1', start_d_t1)
+            thelogger.post_metric('power_usage', 'delivery_tariff2', start_d_t2)
+
             sleep(60)
 
             end_c_t1, end_c_t2, end_d_t1, end_d_t2 = read_meters()
 
             # Log the current power measurement.
-            consumption_tariff1 = calc_power(start_c_t1, end_c_t1)
-            consumption_tariff2 = calc_power(start_c_t2, end_c_t2)
-            delivery_tariff1 = calc_power(start_d_t1, end_d_t1)
-            delivery_tariff2 = calc_power(start_d_t2, end_d_t2)
-
-            thelogger.post_metric(
-                'power_usage', 'consumption_tariff1', consumption_tariff1)
-            thelogger.post_metric(
-                'power_usage', 'consumption_tariff2', consumption_tariff2)
-            thelogger.post_metric(
-                'power_usage', 'delivery_tariff1', delivery_tariff1)
-            thelogger.post_metric(
-                'power_usage', 'delivery_tariff2', delivery_tariff2)
-
             _aggregated_power = aggregated_power(start_c_t1, start_c_t2, start_d_t1, start_d_t2,
                                                  end_c_t1, end_c_t2, end_d_t1, end_d_t2)
-            thelogger.post_metric(
-                'power_usage', 'aggregated_power', _aggregated_power)
+            
+            thelogger.post_metric('power_usage', 'aggregated_power', _aggregated_power)
 
             # Keep a history of max. 10 measurements.
             active_power_history.insert(0, _aggregated_power)
