@@ -59,50 +59,50 @@ class TestRun(unittest.TestCase):
             main.read_meters()
 
     # Notification should be send 1th time at no power.
-    @mock.patch('rvrbase.rvrlogger.Rvrlogger.log_application_event')
+    @mock.patch('rvrbase.Rvrbase.log_app_event')
     # @mock.patch('main.is_no_power_notification_send', False)
-    def test_send_notification_1(self, mock_rvrlogger):
+    def test_send_notification_1(self, mock_rvrbase):
 
         main.send_notification([0, 0, 0, 0])
 
-        mock_rvrlogger.assert_called()
+        mock_rvrbase.assert_called()
 
         # The global var is_no_power_notification_send should be set to True.
         self.assertTrue(main.is_no_power_notification_send)
 
     # Notification should not be send if already send.
-    @mock.patch('rvrbase.rvrlogger.Rvrlogger.log_application_event')
+    @mock.patch('rvrbase.Rvrbase.log_app_event')
     @mock.patch('main.is_no_power_notification_send', True)
-    def test_send_notification_2(self, mock_rvrlogger):
+    def test_send_notification_2(self, mock_rvrbase):
 
         main.send_notification([0, 0, 0, 0])
 
-        mock_rvrlogger.assert_not_called()
+        mock_rvrbase.assert_not_called()
 
         # The global var is_no_power_notification_send should be set to True.
         self.assertTrue(main.is_no_power_notification_send)
 
     # Notification should be send if a lot of power is produced.
-    @mock.patch('rvrbase.rvrlogger.Rvrlogger.log_application_event')
+    @mock.patch('rvrbase.Rvrbase.log_app_event')
     @mock.patch('main.is_no_power_notification_send', True)
-    def test_send_notification_3(self, mock_rvrlogger):
+    def test_send_notification_3(self, mock_rvrbase):
 
         main.send_notification([300, 300, 300])
 
-        mock_rvrlogger.assert_called()
+        mock_rvrbase.assert_called()
 
         # The global var is_no_power_notification_send should be set to false.
         self.assertFalse(main.is_no_power_notification_send)
 
     # Notification should not be send if a lot of power is produced and
     # is_no_power_notification_send is set to false
-    @mock.patch('rvrbase.rvrlogger.Rvrlogger.log_application_event')
+    @mock.patch('rvrbase.Rvrbase.log_app_event')
     @mock.patch('main.is_no_power_notification_send', False)
-    def test_send_notification_4(self, mock_rvrlogger):
+    def test_send_notification_4(self, mock_rvrbase):
 
         main.send_notification([300, 300, 300])
 
-        mock_rvrlogger.assert_not_called()
+        mock_rvrbase.assert_not_called()
 
         # The global var is_no_power_notification_send should be set to false.
         self.assertFalse(main.is_no_power_notification_send)

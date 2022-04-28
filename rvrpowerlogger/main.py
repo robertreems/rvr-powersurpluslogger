@@ -10,8 +10,9 @@
 
 from time import sleep
 import requests
-from rvrbase import rvrlogger
-from rvrbase import rvrconfig
+# from rvrbase import rvrlogger
+# from rvrbase import rvrconfig
+from rvrbase import Rvrbase
 import constants
 import logging
 import exceptions
@@ -20,9 +21,8 @@ import exceptions
 logging.getLogger().setLevel(logging.INFO)
 
 # Get IP of the dongle
-conf = rvrconfig.Rvrconfig(constants.CONFIG_FILE)
-ip = conf.q1('hwip')
-thelogger = rvrlogger.Rvrlogger()
+base = Rvrbase(constants.CONFIG_FILE)
+ip = base.q1('hwip')
 is_no_power_notification_send = False
 
 
@@ -55,7 +55,7 @@ def send_notification(active_power_history):
     global is_no_power_notification_send
 
     if sum(active_power_history) <= 0 and is_no_power_notification_send is False:
-        thelogger.log_application_event(
+        base.log_app_event(
             type='info', message='No power surplus for a prolonged time.',
             notify_message=True)
         is_no_power_notification_send = True
@@ -63,7 +63,7 @@ def send_notification(active_power_history):
         # Reset is_no_power_notification_send to false in order to send message if there is no
         # longer any surplus.
     elif Average(active_power_history) > 250 and is_no_power_notification_send is True:
-        thelogger.log_application_event(
+        base.log_app_event(
             type='info', message='You have got some juice. Use it!', notify_message=True)
         is_no_power_notification_send = False
 
@@ -94,10 +94,12 @@ def run():
             start_c_t1, start_c_t2, start_d_t1, start_d_t2 = read_meters()
 
             # Log the current meter values.
-            thelogger.post_metric('power_usage', 'consumption_tariff1', start_c_t1)
-            thelogger.post_metric('power_usage', 'consumption_tariff2', start_c_t2)
-            thelogger.post_metric('power_usage', 'delivery_tariff1', start_d_t1)
-            thelogger.post_metric('power_usage', 'delivery_tariff2', start_d_t2)
+            base.send_az_metric(
+                'power_usage', 'consumption_tariff1', start_c_t1)
+            base.send_az_metric(
+                'power_usage', 'consumption_tariff2', start_c_t2)
+            base.send_az_metric('power_usage', 'delivery_tariff1', start_d_t1)
+            base.send_az_metric('power_usage', 'delivery_tariff2', start_d_t2)
 
             sleep(60)
 
@@ -106,8 +108,9 @@ def run():
             # Log the current power measurement.
             _aggregated_power = aggregated_power(start_c_t1, start_c_t2, start_d_t1, start_d_t2,
                                                  end_c_t1, end_c_t2, end_d_t1, end_d_t2)
-            
-            thelogger.post_metric('power_usage', 'aggregated_power', _aggregated_power)
+
+            base.send_az_metric(
+                'power_usage', 'aggregated_power', _aggregated_power)
 
             # Keep a history of max. 10 measurements.
             active_power_history.insert(0, _aggregated_power)
@@ -118,14 +121,14 @@ def run():
         except exceptions.HomeWizzardCommunication as error:
             # Todo enable notify_message when method has been implented to prevent an overload of
             # messages.
-            thelogger.log_application_event(
+            base.log_app_event(
                 type='error', message=error, notify_message=False)
             sleep(60)
 
         except Exception as error:
-            thelogger.log_application_event(type='error',
-                                            message=constants.ERR_UNKNOWN_ERROR.format(
-                                                message=error), notify_message=False)
+            base.log_app_event(type='error',
+                               message=constants.ERR_UNKNOWN_ERROR.format(
+                                   message=error), notify_message=False)
             # Todo enable notify_message when method has
             # been implented to prevent an overload of messages.
             sleep(60)
