@@ -6,7 +6,7 @@ variable "name" {
 }
 
 variable "retention_in_days" {
-    default = 30
+    default = 60
 }
 
 variable "sku" {
