@@ -5,3 +5,5 @@ rvrlogging/__pycache__/
 rvrlogging/api/__pycache__/
 venv/
 rvrpowerlogger/__pycache__/
+rvrstatisticslogger/__pycache__/
+deploy/terraform.tfstate.backup
