@@ -6,4 +6,4 @@ rvrlogging/api/__pycache__/
 venv/
 rvrpowerlogger/__pycache__/
 rvrstatisticslogger/__pycache__/
-deploy/terraform.tfstate.backup_backup
+deploy/terraform.tfstate.backup
