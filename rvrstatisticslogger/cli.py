@@ -34,6 +34,11 @@ class Cli:
             action='store_true'
         )
         parser.add_argument(
+            "--log_to_azure",
+            help='Sends the statistics to Azure.',
+            action='store_true'
+        )
+        parser.add_argument(
             "-l", "--loglevel",
             help='sets the loglevel (CRITICAL = 50 ERROR = 40 WARNING = 30 INFO = 20 DEBUG = 10\
                 NOTSET = 0)',

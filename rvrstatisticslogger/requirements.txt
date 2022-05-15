@@ -1,2 +1,0 @@
-﻿requests~=2.22.0
-rvr-base~=1.0.0

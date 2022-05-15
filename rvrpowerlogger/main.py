@@ -94,12 +94,14 @@ def run():
             start_c_t1, start_c_t2, start_d_t1, start_d_t2 = read_meters()
 
             # Log the current meter values.
-            base.send_az_metric(
-                'power_usage', 'consumption_tariff1', start_c_t1)
-            base.send_az_metric(
-                'power_usage', 'consumption_tariff2', start_c_t2)
-            base.send_az_metric('power_usage', 'delivery_tariff1', start_d_t1)
-            base.send_az_metric('power_usage', 'delivery_tariff2', start_d_t2)
+            base.send_az_metric('MyfirstLogAnalytics',
+                                'power_usage', 'consumption_tariff1', start_c_t1)
+            base.send_az_metric('MyfirstLogAnalytics',
+                                'power_usage', 'consumption_tariff2', start_c_t2)
+            base.send_az_metric('MyfirstLogAnalytics',
+                                'power_usage', 'delivery_tariff1', start_d_t1)
+            base.send_az_metric('MyfirstLogAnalytics',
+                                'power_usage', 'delivery_tariff2', start_d_t2)
 
             sleep(60)
 
@@ -109,8 +111,8 @@ def run():
             _aggregated_power = aggregated_power(start_c_t1, start_c_t2, start_d_t1, start_d_t2,
                                                  end_c_t1, end_c_t2, end_d_t1, end_d_t2)
 
-            base.send_az_metric(
-                'power_usage', 'aggregated_power', _aggregated_power)
+            base.send_az_metric('MyfirstLogAnalytics',
+                                'power_usage', 'aggregated_power', _aggregated_power)
 
             # Keep a history of max. 10 measurements.
             active_power_history.insert(0, _aggregated_power)

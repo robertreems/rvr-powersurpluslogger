@@ -24,20 +24,20 @@ def get_power_meter(row, date, sort_order):
 
 def calculate_meter_total(meter, start_date, end_date):
     try:
-        start_daily_measure = get_power_meter(meter, start_date, 'asc')
+        start_measure = get_power_meter(meter, start_date, 'asc')
     except IndexError:
-        start_daily_measure = 0
+        start_measure = 0
 
     try:
-        end_daily_measure = get_power_meter(meter, end_date, 'desc')
+        end_measure = get_power_meter(meter, end_date, 'desc')
     except IndexError:
-        end_daily_measure = 0
+        end_measure = 0
 
-    return round((end_daily_measure - start_daily_measure), 3)
+    return round((end_measure - start_measure), 3)
 
 
 # Get all the meters, and send the calculated statistics to Azure.
-def process_statistics(start_date, end_date):
+def process_statistics(start_date, end_date, period):
     today = date.today()
 
     # Prevent looking in the future.
@@ -53,23 +53,39 @@ def process_statistics(start_date, end_date):
     delivery_tariff2 = calculate_meter_total(
         'delivery_tariff2', start_date, end_date)
 
-    # The daily power consumption / production combined.
-    day_total_consumption = consumption_tariff1 + consumption_tariff2
-    day_total_delivery = delivery_tariff1 + delivery_tariff2
-    daily_total = round((day_total_delivery - day_total_consumption), 3)
+    # Do some calculations.
+    total_consumption = consumption_tariff1 + consumption_tariff2
+    delivery = delivery_tariff1 + delivery_tariff2
+    agregated_total = round((delivery - total_consumption), 3)
+    total_tariff1 = round((delivery_tariff1 - consumption_tariff1), 3)
+    total_tariff2 = round((delivery_tariff2 - consumption_tariff2), 3)
 
-    # I want to log these values to Azure daily.
-    print(f'Total: {daily_total}')
-    print(
-        f'Total tariff 1: { round((delivery_tariff1 - consumption_tariff1), 3)}')
-    print(
-        f'Total tariff 2: {round((delivery_tariff2 - consumption_tariff2), 3)}')
-    print(consumption_tariff1)
-    print(consumption_tariff2)
-    print(delivery_tariff1)
-    print(delivery_tariff2)
+    print(f'Total: {agregated_total}')
+    print(f'Total tariff 1: {total_tariff1}')
+    print(f'Total tariff 2: {total_tariff2}')
+    print(f'Total consumption tariff1: {consumption_tariff1}')
+    print(f'Total consumption tariff2: {consumption_tariff2}')
+    print(f'Total delivery tariff1:{delivery_tariff1}')
+    print(f'Total delivery tariff2: {delivery_tariff2}')
 
-    # base.send_az_metric('power_usage', 'consumption_tariff1', start_c_t1)
+    # log the statistics to Azure
+    if cli.args.log_to_azure:
+        base.send_az_metric(
+            'powerstatistics', f'{period}_powerstatistics', 'consumption_tariff1',
+            consumption_tariff1)
+        base.send_az_metric(
+            'powerstatistics', f'{period}_powerstatistics', 'consumption_tariff2',
+            consumption_tariff2)
+        base.send_az_metric(
+            'powerstatistics', f'{period}_powerstatistics', 'delivery_tariff1', delivery_tariff1)
+        base.send_az_metric(
+            'powerstatistics', f'{period}_powerstatistics', 'delivery_tariff2', delivery_tariff2)
+        base.send_az_metric(
+            'powerstatistics', f'{period}_powerstatistics', 'total_tariff1', total_tariff1)
+        base.send_az_metric(
+            'powerstatistics', f'{period}_powerstatistics', 'total_tariff2', total_tariff2)
+        base.send_az_metric(
+            'powerstatistics', f'{period}_powerstatistics', 'total_aggregated', agregated_total)
 
 
 cli = cli.Cli()
@@ -83,6 +99,8 @@ day = int(start_date[2])
 start_date = date(year, month, day)
 end_date = date.today()
 
+# Loop through period from start_date.
+# If no period argument is supplied, assume the period is day.
 if cli.args.week:
     delta = timedelta(weeks=1)
     while start_date <= end_date:
@@ -94,10 +112,9 @@ if cli.args.week:
 
         print(f"{monday} - {sunday}")
 
-        process_statistics(start_date=monday, end_date=sunday)
+        process_statistics(start_date=monday, end_date=sunday, period='week')
 
         start_date += delta
-
 elif cli.args.month:
     while start_date <= end_date:
         year = int(start_date.strftime("%Y"))
@@ -109,13 +126,15 @@ elif cli.args.month:
 
         print(f"{first_month_day} - {last_month_day}")
 
-        process_statistics(start_date=first_month_day, end_date=last_month_day)
+        process_statistics(start_date=first_month_day,
+                           end_date=last_month_day, period='month')
         delta = timedelta(days=days_in_month)
         start_date += delta
 else:
     delta = timedelta(days=1)
     while start_date <= end_date:
         print(start_date.strftime("%Y-%m-%d"))
-        process_statistics(start_date=start_date, end_date=start_date)
+        process_statistics(start_date=start_date,
+                           end_date=start_date, period='day')
 
         start_date += delta

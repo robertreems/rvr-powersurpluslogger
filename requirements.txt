@@ -1,5 +1,5 @@
 ﻿dbus-python~=1.2.16
 requests~=2.22.0
-rvr-base~=1.0.0
+rvr-base~=1.1.1
 mock
 parameterized
