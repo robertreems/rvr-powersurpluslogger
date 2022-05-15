@@ -23,12 +23,21 @@ This script is developed for Linux and tested on:
 ## Using this script
 It reads a configuration file. You'll have to create that first in /etc/rvr/config.ini. Make sure it has the following contents:
 ```
+[AZ GENERAL]
+tenant = 83ebf573-f6a0-4a5a-a14e-323ba97ec356
+
 [AZ_LOG_ANALYTICS_WORKSPACE]
-workspace_id = AZ WORKSPACE
-primary_key = PRIMAIRY KEY
+workspace_id = 'log analytics workspace_id'
+primary_key = 'log analytics primary key'
+powerstatistics_workspace_id = 'log analytics workspace_id'
+powerstatistics_primary_key = 'log analytics primary key'
+
+[AZ SERVICE PRINCIPAL LOGANALYTICSREADER]
+service_principal_loganalyticsreader_id = 'service principal'
+service_principal_loganalyticsreader_secret = 'secret'
 
 [HOME_WIZARD_P1]
-hwip = IP OF HOME WIZARD DONGLE
+hwip = IP
 ```
 
 Then you're able to run the main.py script file.
