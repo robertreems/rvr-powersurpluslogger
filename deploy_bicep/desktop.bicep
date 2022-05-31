@@ -10,7 +10,7 @@ resource Powerconsumptionproductiondesktop 'Microsoft.Portal/dashboards@2020-09-
             position: {
               x: 0
               y: 0
-              rowSpan: 6
+              rowSpan: 8
               colSpan: 12
             }
             metadata: {
@@ -148,8 +148,8 @@ resource Powerconsumptionproductiondesktop 'Microsoft.Portal/dashboards@2020-09-
           {
             position: {
               x: 0
-              y: 6
-              rowSpan: 4
+              y: 8
+              rowSpan: 8
               colSpan: 12
             }
             metadata: {
@@ -263,8 +263,8 @@ resource Powerconsumptionproductiondesktop 'Microsoft.Portal/dashboards@2020-09-
           {
             position: {
               x: 0
-              y: 12
-              rowSpan: 4
+              y: 16
+              rowSpan: 8
               colSpan: 12
             }
             metadata: {

@@ -11,7 +11,7 @@ resource daebeabcaddf 'Microsoft.Portal/dashboards@2020-09-01-preview' = {
             position: {
               x: 0
               y: 0
-              rowSpan: 4
+              rowSpan: 6
               colSpan: 4
             }
             metadata: {
@@ -150,8 +150,8 @@ resource daebeabcaddf 'Microsoft.Portal/dashboards@2020-09-01-preview' = {
           {
             position: {
               x: 0
-              y: 4
-              rowSpan: 4
+              y: 6
+              rowSpan: 6
               colSpan: 4
             }
             metadata: {
@@ -266,8 +266,8 @@ resource daebeabcaddf 'Microsoft.Portal/dashboards@2020-09-01-preview' = {
           {
             position: {
               x: 0
-              y: 8
-              rowSpan: 4
+              y: 12
+              rowSpan: 6
               colSpan: 4
             }
             metadata: {
